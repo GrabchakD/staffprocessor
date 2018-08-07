@@ -1,4 +1,4 @@
-package com.staffprocessor;
+package com.staffprocessor.driver;
 
 public interface DBInitializer {
 
