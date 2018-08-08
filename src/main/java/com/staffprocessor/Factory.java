@@ -1,27 +1,28 @@
 package com.staffprocessor;
 
-import com.staffprocessor.dao.EmployeeDao;
-import com.staffprocessor.dao.EmployeeDaoImpl;
+import com.staffprocessor.dao.DepartmentDao;
+import com.staffprocessor.dao.DepartmentDaoImpl;
 import com.staffprocessor.dao.InitDao;
 import com.staffprocessor.dao.InitDaoImpl;
+import com.staffprocessor.processor.DBInitializerImpl;
+import com.staffprocessor.presentation.ResponseBuilder;
+import com.staffprocessor.presentation.ResponseBuilderImpl;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.util.stream.Stream;
 
 public class Factory {
 
     private final static String DB_SQL_FILE = "sql/db.sql";
     private final static String INIT_SQL_FILE = "sql/init.sql";
+    private final static String QUERIES_SQL_FILE = "sql/queries.sql";
 
     private final static String SCHEMA_CREATION_QUERY;
     private final static String INIT_SQL_TEMPLATES;
+    private final static String QUERIES_TEMPLATES;
 
-    private static final String DB_URL = "jdbc:h2:tcp://localhost/~/staffprocessor";
+    private static final String DB_URL = "jdbc:h2:~/staffprocessor";
     private static final String DB_DRIVER = "org.h2.Driver";
     private static final String DB_USERNAME = "sa";
     private static final String DB_PASSWORD = "";
@@ -42,6 +43,7 @@ public class Factory {
 
         SCHEMA_CREATION_QUERY = getSqlFromFile(DB_SQL_FILE);
         INIT_SQL_TEMPLATES = getSqlFromFile(INIT_SQL_FILE);
+        QUERIES_TEMPLATES = getSqlFromFile(QUERIES_SQL_FILE);
     }
 
 
@@ -49,12 +51,20 @@ public class Factory {
         return connection;
     }
 
-    public static EmployeeDao getEmployeeDaoImpl(Connection connection) {
-        return new EmployeeDaoImpl(connection);
+    public static DepartmentDao getDepatrmentDaoImpl(Connection connection) {
+        return new DepartmentDaoImpl(connection);
     }
 
     public static InitDao getInitDao(Connection connection) {
         return new InitDaoImpl(connection);
+    }
+
+    public static DBInitializerImpl getDBInitializerImpl(InitDao initDao) {
+        return new DBInitializerImpl(initDao);
+    }
+
+    public static ResponseBuilder getResponceBuilderImpl() {
+        return new ResponseBuilderImpl();
     }
 
     public static String getInsertDepartmentTemplate() {
@@ -69,17 +79,22 @@ public class Factory {
         return INIT_SQL_TEMPLATES.split(";")[2];
     }
 
+    public static String getAgeBoundAndDictrict() {
+        return QUERIES_TEMPLATES.split(";")[0];
+    }
+
     public static String getSchemaCreationQuery() {
         return SCHEMA_CREATION_QUERY;
     }
 
     private static String getSqlFromFile(String fileLocation) {
         ClassLoader cl = ClassLoader.getSystemClassLoader();
+        InputStream is = cl.getResourceAsStream(fileLocation);
+        return convertStreamToString(is);
+    }
 
-        try (Stream<String> stream = Files.lines(Paths.get(cl.getResource(fileLocation).toURI()))) {
-            return stream.reduce("", (s1, s2) -> s1 + '\n' + s2);
-        } catch (IOException | URISyntaxException e) {
-            throw new RuntimeException(e.getMessage());
-        }
+    private static String convertStreamToString(InputStream is) {
+        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
     }
 }

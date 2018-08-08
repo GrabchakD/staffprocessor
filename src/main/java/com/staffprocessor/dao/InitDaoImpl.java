@@ -43,7 +43,7 @@ public class InitDaoImpl extends AbstractDao implements InitDao {
     @Override
     public void insertDepartment(Department dep, String company) {
         String insertDepartmentQuery = String.format(
-                INSERT_DEPARTMENT_TEMPLATE, company, dep.getId(), dep.getDepartmentName(), dep.getDistrictName()
+                INSERT_DEPARTMENT_TEMPLATE, company, dep.getDepartmentName(), dep.getDistrictName()
         );
 
         execute(insertDepartmentQuery);
