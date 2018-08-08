@@ -5,6 +5,13 @@ public class EmployeeId {
     private Long staffId;
     private Long departmentId;
 
+    public EmployeeId() {
+    }
+
+    public EmployeeId(Long staffId, Long departmentId) {
+        this.staffId = staffId;
+        this.departmentId = departmentId;
+    }
 
     public Long getStaffId() {
         return staffId;

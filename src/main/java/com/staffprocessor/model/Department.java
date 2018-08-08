@@ -10,6 +10,11 @@ public class Department {
     private String districtName;
     private Set<Employee> employees = new HashSet<>();
 
+    public Department(Long id, String departmentName, String districtName) {
+        this.id = id;
+        this.departmentName = departmentName;
+        this.districtName = districtName;
+    }
 
     public Long getId() {
         return id;
